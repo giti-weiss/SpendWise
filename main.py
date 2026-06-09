@@ -18,11 +18,9 @@ app = Flask(__name__)
 app.register_blueprint(categories_blueprint)
 app.register_blueprint(users_blueprint)
 
-
 @app.route('/')
 def home():
     return "Server is running!"
-
 
 if __name__ == '__main__':
     app.run(debug=True)
