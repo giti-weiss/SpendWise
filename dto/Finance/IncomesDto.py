@@ -2,23 +2,21 @@ from pydantic import BaseModel
 from datetime import date
 
 
-class IncomeFrequencyDTO(BaseModel):
-    frequency_id: int
-    frequency_name: str
-
-    class Config:
-        from_attributes = True
-
-
 class IncomeCreateDTO(BaseModel):
     user_id: int
     frequency_id: int
-    amount: int
+    category_id: int
+    amount: float
     date: date
 
 
-class IncomeResponseDTO(IncomeCreateDTO):
+class IncomeResponseDTO(BaseModel):
     transaction_id: int
+    user_id: int
+    frequency_id: int
+    category_id: int
+    amount: float
+    date: date
 
     class Config:
         from_attributes = True

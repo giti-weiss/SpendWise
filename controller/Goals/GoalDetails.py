@@ -12,7 +12,7 @@ service = GoalDetailsService(repo)
 
 goal_details_blueprint = Blueprint(
     "goal_details",
-    __name__
+    __name__, url_prefix='/goal_details'
 )
 
 

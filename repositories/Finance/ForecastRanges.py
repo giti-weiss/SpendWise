@@ -28,10 +28,4 @@ class ForecastRangesRepository(BaseRepository):
         self.session.commit()
         return forecast_range
 
-    def delete_by_id(self, range_id):
-        forecast_range = self.get_by_id(range_id)
 
-        if forecast_range:
-            self.delete(forecast_range)
-
-        return forecast_range

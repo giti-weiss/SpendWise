@@ -1,56 +1,95 @@
-from fastapi import APIRouter, Depends, HTTPException
+from flask import Blueprint, request, jsonify
 from sqlalchemy.orm import Session
-
 from dto.survey.SurveyAnswersDto import (
     SurveyAnswerCreateDTO,
     SurveyAnswerResponseDTO
 )
 from services.survey.SurveyAnswers import SurveyAnswersService
 from repositories.survey.SurveyAnswers import SurveyAnswersRepository
-from db_connection import get_db
+from db_connection import SessionLocal
 
-router = APIRouter(prefix="/survey-answers", tags=["Survey Answers"])
+survey_answers_blueprint = Blueprint(
+    'survey_answers',
+    __name__,
+    url_prefix='/survey-answers'
+)
 
+def get_service():
+    session: Session = SessionLocal()
+    repo = SurveyAnswersRepository(session)
+    service = SurveyAnswersService(repo)
+    return session, service
 
-def get_service(db: Session = Depends(get_db)) -> SurveyAnswersService:
-    repo = SurveyAnswersRepository(db)
-    return SurveyAnswersService(repo)
+# ==================== יצירה ====================
+@survey_answers_blueprint.route('/', methods=['POST'])
+def create_answer():
+    session, service = get_service()
+    try:
+        dto = SurveyAnswerCreateDTO(**request.get_json())
+        answer = service.create(dto)
+        return jsonify(SurveyAnswerResponseDTO.model_validate(answer).model_dump(mode="json")), 201
+    finally:
+        session.close()
 
+# ==================== קבלת הכל ====================
+@survey_answers_blueprint.route('/', methods=['GET'])
+def get_all_answers():
+    session, service = get_service()
+    try:
+        answers = service.get_all()
+        return jsonify([
+            SurveyAnswerResponseDTO.model_validate(a).model_dump(mode="json")
+            for a in answers
+        ])
+    finally:
+        session.close()
 
-@router.get("/", response_model=list[SurveyAnswerResponseDTO])
-def get_all(service: SurveyAnswersService = Depends(get_service)):
-    return service.get_all()
+# ==================== קבלת לפי ID ====================
+@survey_answers_blueprint.route('/<int:answer_id>', methods=['GET'])
+def get_answer_by_id(answer_id):
+    session, service = get_service()
+    try:
+        answer = service.get_by_id(answer_id)
+        if not answer:
+            return jsonify({"error": "Answer not found"}), 404
+        return jsonify(SurveyAnswerResponseDTO.model_validate(answer).model_dump(mode="json"))
+    finally:
+        session.close()
 
+# ==================== קבלת לפי סקר ====================
+@survey_answers_blueprint.route('/survey/<int:survey_id>', methods=['GET'])
+def get_answers_by_survey(survey_id):
+    session, service = get_service()
+    try:
+        answers = service.get_by_survey(survey_id)
+        return jsonify([
+            SurveyAnswerResponseDTO.model_validate(a).model_dump(mode="json")
+            for a in answers
+        ])
+    finally:
+        session.close()
 
-@router.get("/{answer_id}", response_model=SurveyAnswerResponseDTO)
-def get_by_id(answer_id: int, service: SurveyAnswersService = Depends(get_service)):
-    result = service.get_by_id(answer_id)
-    if not result:
-        raise HTTPException(status_code=404, detail="Answer not found")
-    return result
+# ==================== עדכון ====================
+@survey_answers_blueprint.route('/<int:answer_id>', methods=['PUT'])
+def update_answer(answer_id):
+    session, service = get_service()
+    try:
+        answer_value = request.get_json().get("answer_value")
+        answer = service.update(answer_id, answer_value)
+        if not answer:
+            return jsonify({"error": "Answer not found"}), 404
+        return jsonify(SurveyAnswerResponseDTO.model_validate(answer).model_dump(mode="json"))
+    finally:
+        session.close()
 
-
-@router.get("/survey/{survey_id}", response_model=list[SurveyAnswerResponseDTO])
-def get_by_survey(survey_id: int, service: SurveyAnswersService = Depends(get_service)):
-    return service.get_by_survey(survey_id)
-
-
-@router.post("/", response_model=SurveyAnswerResponseDTO)
-def create(dto: SurveyAnswerCreateDTO, service: SurveyAnswersService = Depends(get_service)):
-    return service.create(dto)
-
-
-@router.put("/{answer_id}", response_model=SurveyAnswerResponseDTO)
-def update(answer_id: int, answer_value: int, service: SurveyAnswersService = Depends(get_service)):
-    result = service.update(answer_id, answer_value)
-    if not result:
-        raise HTTPException(status_code=404, detail="Answer not found")
-    return result
-
-
-@router.delete("/{answer_id}")
-def delete(answer_id: int, service: SurveyAnswersService = Depends(get_service)):
-    success = service.delete(answer_id)
-    if not success:
-        raise HTTPException(status_code=404, detail="Answer not found")
-    return {"success": True}
+# ==================== מחיקה ====================
+@survey_answers_blueprint.route('/<int:answer_id>', methods=['DELETE'])
+def delete_answer(answer_id):
+    session, service = get_service()
+    try:
+        success = service.delete(answer_id)
+        if not success:
+            return jsonify({"error": "Answer not found"}), 404
+        return jsonify({"success": True})
+    finally:
+        session.close()

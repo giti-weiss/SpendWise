@@ -11,14 +11,8 @@ session = SessionLocal()
 repo = CategoryTypesRepository(session)
 service = CategoryTypesService(repo)
 
-category_types_bp = Blueprint("category_types", __name__)
+category_types_bp = Blueprint("category_types", __name__, url_prefix='/category_types')
 
-
-@category_types_bp.route('', methods=['POST'])
-def create():
-    dto = CategoryTypeDTO(**request.get_json())
-    obj = service.create(dto)
-    return jsonify({"category_type_id": obj.category_type_id}), 201
 
 
 @category_types_bp.route('', methods=['GET'])
@@ -45,6 +39,15 @@ def get_by_id(category_type_id):
     })
 
 
+
+"""
+@category_types_bp.route('', methods=['POST'])
+def create():
+    dto = CategoryTypeDTO(**request.get_json())
+    obj = service.create(dto)
+    return jsonify({"category_type_id": obj.category_type_id}), 201
+
+
 @category_types_bp.route('/<int:category_type_id>', methods=['PUT'])
 def update(category_type_id):
     dto = CategoryTypeDTO(**request.get_json())
@@ -64,3 +67,4 @@ def delete(category_type_id):
         return jsonify({"error": "not found"}), 404
 
     return jsonify({"message": "deleted"})
+"""

@@ -16,7 +16,9 @@ class IncomeFrequencyRepository(BaseRepository):
     def get_all(self):
         return self.session.query(IncomeFrequency).all()
 
-    def update(self, frequency_id, **kwargs):
+
+    """
+     def update(self, frequency_id, **kwargs):
         frequency = self.get_by_id(frequency_id)
 
         if not frequency:
@@ -35,3 +37,4 @@ class IncomeFrequencyRepository(BaseRepository):
             self.delete(frequency)
 
         return frequency
+    """

@@ -9,7 +9,8 @@ class ExpenseType(Base):
 
     expenseTypeId = Column(
         Integer,
-        primary_key=True
+        primary_key=True,
+        autoincrement=True  # <- הוסף את זה
     )
 
     expenseTypeName = Column(

@@ -17,4 +17,6 @@ class Recommendation(Base):
         "Text",
         back_populates="recommendations"
     )
-# Recommendations.py - models
+"""
+המלצות
+"""

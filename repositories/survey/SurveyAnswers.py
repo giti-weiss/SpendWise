@@ -1,16 +1,14 @@
 from typing import List, Optional
 from models.survey.SurveyAnswers import SurveyAnswer
 from repositories.base_repository import BaseRepository
-
+from dto.survey.SurveyAnswersDto import SurveyAnswerCreateDTO
 
 class SurveyAnswersRepository(BaseRepository):
 
     def get_by_id(self, answer_id: int) -> Optional[SurveyAnswer]:
-        return (
-            self.session.query(SurveyAnswer)
-            .filter_by(answer_id=answer_id)
-            .first()
-        )
+        return self.session.query(SurveyAnswer).filter(
+            SurveyAnswer.answer_id == answer_id
+        ).first()
 
     def get_all(self) -> List[SurveyAnswer]:
         return self.session.query(SurveyAnswer).all()
@@ -18,23 +16,23 @@ class SurveyAnswersRepository(BaseRepository):
     def get_by_survey(self, survey_id: int) -> List[SurveyAnswer]:
         return (
             self.session.query(SurveyAnswer)
-            .filter_by(survey_id=survey_id)
+            .filter(SurveyAnswer.survey_id == survey_id)
             .all()
         )
 
-    def create(self, survey_id, question_code, question_text, answer_value):
+    def create(self, dto: SurveyAnswerCreateDTO) -> SurveyAnswer:
         obj = SurveyAnswer(
-            survey_id=survey_id,
-            question_code=question_code,
-            question_text=question_text,
-            answer_value=answer_value
+            survey_id=dto.survey_id,
+            question_code=dto.question_code,
+            question_text=dto.question_text,
+            answer_value=dto.answer_value
         )
         self.session.add(obj)
         self.session.commit()
         self.session.refresh(obj)
         return obj
 
-    def update(self, answer_id: int, **kwargs):
+    def update(self, answer_id: int, **kwargs) -> Optional[SurveyAnswer]:
         obj = self.get_by_id(answer_id)
         if not obj:
             return None
@@ -55,3 +53,4 @@ class SurveyAnswersRepository(BaseRepository):
         self.session.delete(obj)
         self.session.commit()
         return True
+

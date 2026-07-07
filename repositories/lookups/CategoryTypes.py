@@ -1,6 +1,7 @@
 # repositories/enums/category_types_repository.py
 
-from models.lookups import CategogyType
+# נכון
+from models.lookups.CategogyType import CategoryType
 from repositories.base_repository import BaseRepository
 
 
@@ -8,15 +9,17 @@ class CategoryTypesRepository(BaseRepository):
 
     def get_by_id(self, category_type_id):
         return (
-            self.session.query(CategogyType)
+            self.session.query(CategoryType)
             .filter_by(category_type_id=category_type_id)
             .first()
         )
 
     def get_all(self):
-        return self.session.query(CategogyType).all()
+        return self.session.query(CategoryType).all()
 
-    def update(self, category_type_id, **kwargs):
+
+    """
+      def update(self, category_type_id, **kwargs):
         category_type = self.get_by_id(category_type_id)
 
         if not category_type:
@@ -35,3 +38,4 @@ class CategoryTypesRepository(BaseRepository):
             self.delete(category_type)
 
         return category_type
+    """

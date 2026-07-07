@@ -1,12 +1,22 @@
-from sqlalchemy import Column, Integer, Date, DateTime, ForeignKey, Numeric
+from sqlalchemy import Column, Integer, Date, String
 from sqlalchemy.orm import relationship
 from models.base import Base
+
+
 class SpecialDate(Base):
     __tablename__ = "Special_Dates"
 
-    special_date_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("Users.user_id"))
-    type_id = Column(Integer, ForeignKey("Special_Date_Types.type_id"))
-    date = Column(Date)
+    type_id = Column(Integer, primary_key=True, autoincrement=True)
+    holiday_name = Column(String(100), nullable=False)
+    start_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False)
 
-    user = relationship("User", back_populates="special_dates")
+    special_period_summaries = relationship(
+        "SpecialPeriodSummary",
+        back_populates="special_period"
+    )
+
+    holiday_category_summaries = relationship(
+        "HolidayCategorySummary",
+        back_populates="special_period"
+    )

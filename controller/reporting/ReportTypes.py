@@ -1,49 +1,47 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-
-from dto.reporting.ReportTypesDto import ReportTypeDTO
+# controllers/Reports/ReportTypesController.py
+from flask import Blueprint, request, jsonify
 from services.Reports.ReportTypes import ReportTypesService
 from repositories.reporting.ReportTypes import ReportTypesRepository
-from db_connection import get_db
+from db_connection import SessionLocal
+
+session = SessionLocal()
+repo = ReportTypesRepository(session)
+service = ReportTypesService(repo)
+
+report_types_bp = Blueprint("report_types", __name__, url_prefix="/report_types")
+
+@report_types_bp.route("", methods=["GET"])
+def get_all():
+    data = service.get_all()
+    return jsonify([{"report_type_id": r.report_type_id, "report_type_name": r.report_type_name} for r in data])
+
+@report_types_bp.route("/<int:report_type_id>", methods=["GET"])
+def get_by_id(report_type_id):
+    r = service.get_by_id(report_type_id)
+    if not r:
+        return jsonify({"error": "Not found"}), 404
+    return jsonify({"report_type_id": r.report_type_id, "report_type_name": r.report_type_name})
 
 
-router = APIRouter(prefix="/report-types", tags=["Report Types"])
+"""
+@report_types_bp.route("", methods=["POST"])
+def create():
+    data = request.get_json()
+    r = service.create(data["report_type_name"])
+    return jsonify({"report_type_id": r.report_type_id}), 201
 
+@report_types_bp.route("/<int:report_type_id>", methods=["PUT"])
+def update(report_type_id):
+    data = request.get_json()
+    r = service.update(report_type_id, data["report_type_name"])
+    if not r:
+        return jsonify({"error": "Not found"}), 404
+    return jsonify({"message": "updated"})
 
-def get_service(db: Session = Depends(get_db)) -> ReportTypesService:
-    repo = ReportTypesRepository(db)
-    return ReportTypesService(repo)
-
-
-@router.get("/", response_model=list[ReportTypeDTO])
-def get_all(service: ReportTypesService = Depends(get_service)):
-    return service.get_all()
-
-
-@router.get("/{report_type_id}", response_model=ReportTypeDTO)
-def get_by_id(report_type_id: int, service: ReportTypesService = Depends(get_service)):
-    result = service.get_by_id(report_type_id)
-    if not result:
-        raise HTTPException(status_code=404, detail="Not found")
-    return result
-
-
-@router.post("/", response_model=ReportTypeDTO)
-def create(report_type_name: str, service: ReportTypesService = Depends(get_service)):
-    return service.create(report_type_name)
-
-
-@router.put("/{report_type_id}", response_model=ReportTypeDTO)
-def update(report_type_id: int, report_type_name: str, service: ReportTypesService = Depends(get_service)):
-    result = service.update(report_type_id, report_type_name)
-    if not result:
-        raise HTTPException(status_code=404, detail="Not found")
-    return result
-
-
-@router.delete("/{report_type_id}")
-def delete(report_type_id: int, service: ReportTypesService = Depends(get_service)):
+@report_types_bp.route("/<int:report_type_id>", methods=["DELETE"])
+def delete(report_type_id):
     success = service.delete(report_type_id)
     if not success:
-        raise HTTPException(status_code=404, detail="Not found")
-    return {"success": True}
+        return jsonify({"error": "Not found"}), 404
+    return jsonify({"message": "deleted"})
+"""

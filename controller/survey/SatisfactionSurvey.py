@@ -1,57 +1,83 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-
+from flask import Blueprint, request, jsonify
 from dto.survey.SatisfactionSurveyDto import (
     SatisfactionSurveyCreateDTO,
     SatisfactionSurveyResponseDTO
 )
 from services.survey.SatisfactionSurvey import SatisfactionSurveyService
 from repositories.survey.SatisfactionSurvey import SatisfactionSurveyRepository
-from db_connection import get_db
+from db_connection import SessionLocal
 
+satisfaction_survey_blueprint = Blueprint(
+    'satisfaction_survey',
+    __name__,
+    url_prefix='/satisfaction-survey'
+)
 
-router = APIRouter(prefix="/satisfaction-survey", tags=["Satisfaction Survey"])
+def get_service():
+    session = SessionLocal()
+    repo = SatisfactionSurveyRepository(session)
+    service = SatisfactionSurveyService(repo)
+    return session, service
 
+# ==================== יצירה ====================
+@satisfaction_survey_blueprint.route('/', methods=['POST'])
+def create_survey():
+    session, service = get_service()
+    try:
+        dto = SatisfactionSurveyCreateDTO(**request.get_json())
+        survey = service.create(dto)
+        return jsonify({"survey_id": survey.survey_id}), 201
+    finally:
+        session.close()
 
-def get_service(db: Session = Depends(get_db)) -> SatisfactionSurveyService:
-    repo = SatisfactionSurveyRepository(db)
-    return SatisfactionSurveyService(repo)
+# ==================== קבלת הכל ====================
+@satisfaction_survey_blueprint.route('/', methods=['GET'])
+def get_all_surveys():
+    session, service = get_service()
+    try:
+        surveys = service.get_all()
+        return jsonify([
+            SatisfactionSurveyResponseDTO.model_validate(s).model_dump(mode="json")
+            for s in surveys
+        ])
+    finally:
+        session.close()
 
+# ==================== קבלת לפי ID ====================
+@satisfaction_survey_blueprint.route('/<int:survey_id>', methods=['GET'])
+def get_survey(survey_id):
+    session, service = get_service()
+    try:
+        survey = service.get_by_id(survey_id)
+        if not survey:
+            return jsonify({"error": "Survey not found"}), 404
+        return jsonify(
+            SatisfactionSurveyResponseDTO.model_validate(survey).model_dump(mode="json")
+        )
+    finally:
+        session.close()
 
-@router.get("/", response_model=list[SatisfactionSurveyResponseDTO])
-def get_all(service: SatisfactionSurveyService = Depends(get_service)):
-    return service.get_all()
+# ==================== עדכון ====================
+@satisfaction_survey_blueprint.route('/<int:survey_id>', methods=['PUT'])
+def update_survey(survey_id):
+    session, service = get_service()
+    try:
+        feedback = request.get_json().get("feedback")
+        survey = service.update(survey_id, feedback)
+        if not survey:
+            return jsonify({"error": "Survey not found"}), 404
+        return jsonify({"message": "Survey updated"})
+    finally:
+        session.close()
 
-
-@router.get("/{survey_id}", response_model=SatisfactionSurveyResponseDTO)
-def get_by_id(survey_id: int, service: SatisfactionSurveyService = Depends(get_service)):
-    result = service.get_by_id(survey_id)
-    if not result:
-        raise HTTPException(status_code=404, detail="Not found")
-    return result
-
-
-@router.get("/user/{user_id}", response_model=list[SatisfactionSurveyResponseDTO])
-def get_by_user(user_id: int, service: SatisfactionSurveyService = Depends(get_service)):
-    return service.get_by_user(user_id)
-
-
-@router.post("/", response_model=SatisfactionSurveyResponseDTO)
-def create(dto: SatisfactionSurveyCreateDTO, service: SatisfactionSurveyService = Depends(get_service)):
-    return service.create(dto)
-
-
-@router.put("/{survey_id}", response_model=SatisfactionSurveyResponseDTO)
-def update(survey_id: int, feedback: str, service: SatisfactionSurveyService = Depends(get_service)):
-    result = service.update(survey_id, feedback)
-    if not result:
-        raise HTTPException(status_code=404, detail="Not found")
-    return result
-
-
-@router.delete("/{survey_id}")
-def delete(survey_id: int, service: SatisfactionSurveyService = Depends(get_service)):
-    success = service.delete(survey_id)
-    if not success:
-        raise HTTPException(status_code=404, detail="Not found")
-    return {"success": True}
+# ==================== מחיקה ====================
+@satisfaction_survey_blueprint.route('/<int:survey_id>', methods=['DELETE'])
+def delete_survey(survey_id):
+    session, service = get_service()
+    try:
+        success = service.delete(survey_id)
+        if not success:
+            return jsonify({"error": "Survey not found"}), 404
+        return jsonify({"message": "Survey deleted"})
+    finally:
+        session.close()

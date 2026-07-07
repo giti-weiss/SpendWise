@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 
-from dto.core.usersDto import UserCreateDTO
+from dto.core.usersDto import UserCreateDTO, UserUpdateDTO
 from services.core.Users import UsersService
 from repositories.core.Users import UserRepository
 from db_connection import SessionLocal
@@ -31,7 +31,9 @@ def create_user():
 
         return jsonify({
             "user_id": user.user_id,
-            "message": "User created"
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "email": user.email
         }), 201
 
     finally:
@@ -90,7 +92,7 @@ def update_user(user_id):
     db_session, service = get_service()
 
     try:
-        dto = UserCreateDTO(**request.get_json())
+        dto = UserUpdateDTO(**request.get_json())
 
         updated_user = service.update_user(user_id, dto)
 

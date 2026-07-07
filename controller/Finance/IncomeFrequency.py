@@ -14,19 +14,10 @@ service = IncomeFrequencyService(repo)
 
 income_frequency_blueprint = Blueprint(
     "income_frequency",
-    __name__
+    __name__, url_prefix='/income_frequency'
 )
 
 
-@income_frequency_blueprint.route('', methods=['POST'])
-def add_frequency():
-    dto = IncomeFrequencyDTO(**request.get_json())
-
-    frequency = service.add_frequency(dto)
-
-    return jsonify({
-        "frequency_id": frequency.frequency_id
-    }), 201
 
 
 @income_frequency_blueprint.route('', methods=['GET'])
@@ -55,7 +46,16 @@ def get_frequency(frequency_id):
         "frequency_id": frequency.frequency_id,
         "frequency_name": frequency.frequency_name
     })
+"""
+@income_frequency_blueprint.route('', methods=['POST'])
+def add_frequency():
+    dto = IncomeFrequencyDTO(**request.get_json())
 
+    frequency = service.add_frequency(dto)
+
+    return jsonify({
+        "frequency_id": frequency.frequency_id
+    }), 201
 
 @income_frequency_blueprint.route('/<int:frequency_id>', methods=['PUT'])
 def update_frequency(frequency_id):
@@ -88,3 +88,5 @@ def delete_frequency(frequency_id):
     return jsonify({
         "message": "Frequency deleted"
     })
+"""
+

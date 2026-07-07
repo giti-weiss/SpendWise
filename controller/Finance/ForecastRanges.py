@@ -12,7 +12,7 @@ service = ForecastRangeService(repo)
 
 forecast_ranges_blueprint = Blueprint(
     'forecast_ranges',
-    __name__
+    __name__, url_prefix='/forecast_ranges'
 )
 
 @forecast_ranges_blueprint.route('', methods=['POST'])
@@ -24,7 +24,6 @@ def add_range():
     return jsonify({
         "range_id": forecast_range.range_id
     }), 201
-
 
 @forecast_ranges_blueprint.route('', methods=['GET'])
 def get_ranges():
@@ -73,15 +72,3 @@ def update_range(range_id):
     })
 
 
-@forecast_ranges_blueprint.route('/<int:range_id>', methods=['DELETE'])
-def delete_range(range_id):
-    forecast_range = service.delete_range(range_id)
-
-    if not forecast_range:
-        return jsonify({
-            "error": "Range not found"
-        }), 404
-
-    return jsonify({
-        "message": "Range deleted"
-    })

@@ -1,13 +1,14 @@
-from dto.Finance.ExpenseTypeDto import ExpenseTypeDTO
+from dto.Finance.ExpenseTypeDto import ExpenseTypeDTO, ExpenseTypeCreateDTO
 from repositories.Finance.ExpenseTypes import ExpenseTypesRepository
 from models.Finance.ExpenseType import ExpenseType
+
 
 class ExpenseTypeService:
     def __init__(self, repository: ExpenseTypesRepository):
         self.repo = repository
 
     # --- CREATE ---
-    def add_expense_type(self, dto: ExpenseTypeDTO) -> ExpenseType:
+    def add_expense_type(self, dto: ExpenseTypeCreateDTO) -> ExpenseType:
         expense_type = ExpenseType(
             expenseTypeName=dto.ExpenseTypeName
         )
@@ -23,7 +24,7 @@ class ExpenseTypeService:
         return self.repo.get_by_id(expense_type_id)
 
     # --- UPDATE ---
-    def update_expense_type(self, expense_type_id: int, dto: ExpenseTypeDTO):
+    def update_expense_type(self, expense_type_id: int, dto: ExpenseTypeCreateDTO):
         return self.repo.update(
             expense_type_id,
             expenseTypeName=dto.ExpenseTypeName

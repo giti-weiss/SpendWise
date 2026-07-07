@@ -3,7 +3,6 @@ from datetime import date
 
 
 class ForecastRangeDTO(BaseModel):
-    range_id: int
     range_name: str
 
     class Config:

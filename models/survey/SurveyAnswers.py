@@ -4,7 +4,6 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from models.base import Base
 
-
 class SurveyAnswer(Base):
     __tablename__ = 'Survey_Answers'
     answer_id = Column(Integer, primary_key=True)

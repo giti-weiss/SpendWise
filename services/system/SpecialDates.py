@@ -1,35 +1,26 @@
-from dto.system.SpecialDateDto import SpecialDateCreateDTO, SpecialDateResponseDTO
-from repositories.system.SpecialDates import SpecialDatesRepository
+from models.system.SpecialDate import SpecialDate
+from repositories.system.SpecialDates import SpecialDateRepository
+from dto.system.SpecialDateDto import SpecialDateCreateDTO
 
 
-class SpecialDatesService:
+class SpecialDateService:
 
-    def __init__(self, repository: SpecialDatesRepository):
-        self.repository = repository
-
-    def create(self, dto: SpecialDateCreateDTO):
-        obj = self.repository.create(dto.dict())
-        return SpecialDateResponseDTO.model_validate(obj)
-
-    def get_by_id(self, special_date_id: int):
-        obj = self.repository.get_by_id(special_date_id)
-        return SpecialDateResponseDTO.model_validate(obj) if obj else None
+    def __init__(self, repo: SpecialDateRepository):
+        self.repo = repo
 
     def get_all(self):
-        return [
-            SpecialDateResponseDTO.model_validate(x)
-            for x in self.repository.get_all()
-        ]
+        return self.repo.get_all()
 
-    def get_by_user(self, user_id: int):
-        return [
-            SpecialDateResponseDTO.model_validate(x)
-            for x in self.repository.get_by_user(user_id)
-        ]
+    def get_by_id(self, type_id: int):
+        return self.repo.get_by_id(type_id)
 
-    def update(self, special_date_id: int, **kwargs):
-        obj = self.repository.update(special_date_id, **kwargs)
-        return SpecialDateResponseDTO.model_validate(obj) if obj else None
+    def update(self, type_id: int, dto: SpecialDateCreateDTO):
+        return self.repo.update(
+            type_id,
+            holiday_name=dto.holiday_name,
+            start_date=dto.start_date,
+            end_date=dto.end_date
+        )
 
-    def delete(self, special_date_id: int):
-        return self.repository.delete_by_id(special_date_id)
+    def delete(self, type_id: int):
+        return self.repo.delete_by_id(type_id)

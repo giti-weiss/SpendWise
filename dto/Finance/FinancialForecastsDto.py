@@ -1,10 +1,16 @@
+# dto/Finance/FinancialForecastsDto.py
 from pydantic import BaseModel
 from datetime import date
+from typing import Optional
 
-class FinancialForecastsDto(BaseModel):
-    forecast_id: int
+# --- DTO ליצירה ---
+class FinancialForecastCreateDto(BaseModel):
     user_id: int
     category_id: int
     forecast_date: date
-    count: int
+    forecast_count: int
     range_id: int
+
+# --- DTO לקריאה/עדכון ---
+class FinancialForecastDto(FinancialForecastCreateDto):
+    forecast_id: int

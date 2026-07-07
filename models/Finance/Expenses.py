@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, Date, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
-
+from sqlalchemy import Float
 from models.base import Base
 
 class Expense(Base):
@@ -15,7 +15,7 @@ class Expense(Base):
         nullable=False
     )
 
-    amount = Column(Integer, nullable=False)
+    amount = Column(Float, nullable=False)
     date = Column(Date, nullable=False)
 
     expense_type_id = Column(

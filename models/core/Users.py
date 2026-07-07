@@ -12,7 +12,6 @@ class User(Base):
     password_hash = Column(String(255), nullable=False)
     join_date = Column(DateTime, nullable=False)
 
-    categories = relationship("Category", back_populates="user")
     incomes = relationship("Income", back_populates="user")
     expenses = relationship("Expense", back_populates="user")
     goals = relationship("Goal", back_populates="user")
@@ -22,7 +21,7 @@ class User(Base):
     )
     reports = relationship("Report", back_populates="user")
     recommendations = relationship("Recommendation", back_populates="user")
-    special_dates = relationship("SpecialDate", back_populates="user")
+
     special_expenses = relationship("SpecialExpense", back_populates="user")
     forecasts = relationship("FinancialForecast", back_populates="user")
     holiday_summaries = relationship("HolidayCategorySummary", back_populates="user")
@@ -34,3 +33,23 @@ class User(Base):
         "MonthlyExpensesSummary",
         back_populates="user"
     )
+    special_period_summaries = relationship(
+        "SpecialPeriodSummary",
+        back_populates="user"
+    )
+    category_goals = relationship("UserCategoryGoal", back_populates="user")
+    family_size = Column(
+        Integer,
+        nullable=False,
+        default=1
+    )
+    category_preferences = relationship(
+        "UserCategoryPreference",
+        back_populates="user"
+    )
+    saving_goal = relationship(
+        "UserSavingGoal",
+        back_populates="user",
+        uselist=False
+    )
+

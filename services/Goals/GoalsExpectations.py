@@ -1,11 +1,11 @@
 # services/goals_expectations_service.py
-from dto.Goals.GoalsExpectationsDto import GoalsExpectationsDto
+from dto.Goals.GoalsDto import GoalCreateDTO
 from repositories.Goals.GoalsExpectations import GoalsExpectationsRepository
 from models.Goals.GoalsExpectations import GoalExpectation
 
 
 class GoalsExpectationsService:
-    def __init__(self, repo: GoalsExpectationsRepository):
+    def __init__(self, repo: Goals):
         self.repo = repo
 
     def create_expectation(self, dto: GoalsExpectationsDto):

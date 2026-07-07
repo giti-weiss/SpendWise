@@ -11,7 +11,7 @@ session = SessionLocal()
 repo = ReportsRepository(session)
 service = ReportsService(repo)
 
-reports_bp = Blueprint("reports", __name__)
+reports_bp = Blueprint("reports", __name__, url_prefix='/reports')
 
 
 @reports_bp.route('', methods=['POST'])

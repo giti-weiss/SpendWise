@@ -27,5 +27,3 @@ class ForecastRangeService:
             range_name=dto.range_name
         )
 
-    def delete_range(self, range_id: int):
-        return self.repo.delete_by_id(range_id)

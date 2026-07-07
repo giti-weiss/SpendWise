@@ -1,9 +1,13 @@
-from pydantic import BaseModel
+# dto/reporting/ReportTypesDto.py
+
+from pydantic import BaseModel, ConfigDict
 
 
-class ReportTypeDTO(BaseModel):
-    report_type_id: int
+class ReportTypeCreateDTO(BaseModel):
     report_type_name: str
 
-    class Config:
-        from_attributes = True
+
+class ReportTypeResponseDTO(ReportTypeCreateDTO):
+    report_type_id: int
+
+    model_config = ConfigDict(from_attributes=True)

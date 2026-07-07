@@ -10,12 +10,11 @@ class CategoryBaseDTO(BaseModel):
 
 
 class CategoryCreateDTO(CategoryBaseDTO):
-    user_id: int
+    pass
 
 
 class CategoryResponseDTO(CategoryBaseDTO):
     category_id: int
-    user_id: int
     created_at: datetime
 
     class Config:

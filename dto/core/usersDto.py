@@ -10,6 +10,7 @@ class UserBaseDTO(BaseModel):
 
 class UserCreateDTO(UserBaseDTO):
     password_hash: str
+    family_size: int
 
 
 class UserResponseDTO(UserBaseDTO):
@@ -18,3 +19,8 @@ class UserResponseDTO(UserBaseDTO):
 
     class Config:
         from_attributes = True
+class UserUpdateDTO(BaseModel):
+    first_name: str | None = None
+    last_name: str | None = None
+    email: EmailStr | None = None
+    password_hash: str | None = None

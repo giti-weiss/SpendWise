@@ -1,29 +1,31 @@
-# repositories/expense_repository.py
 from models.Finance.Expenses import Expense
 from repositories.base_repository import BaseRepository
 
 
 class ExpenseRepository(BaseRepository):
 
+    # ---------------- CREATE ----------------
+    def add(self, expense):
+        self.session.add(expense)
+        self.session.commit()
+        self.session.refresh(expense)
+        return expense
+
+    # ---------------- READ BY ID ----------------
     def get_by_id(self, expense_id):
         return (
             self.session.query(Expense)
-            .filter_by(ExpenseId=expense_id)
+            .filter_by(transaction_id=expense_id)
             .first()
         )
 
+    # ---------------- READ ALL ----------------
     def get_all(self):
         return self.session.query(Expense).all()
 
-    def exists_by_name(self, name):
-        return (
-            self.session.query(Expense)
-            .filter_by(ExpenseName=name)
-            .first() is not None
-        )
-
-    def update(self, expense_id, **kwargs):
-        expense = self.get_by_id(expense_id)
+    # ---------------- UPDATE ----------------
+    def update(self, transaction_id: int, **kwargs):
+        expense = self.get_by_id(transaction_id)
 
         if not expense:
             return None
@@ -32,12 +34,16 @@ class ExpenseRepository(BaseRepository):
             setattr(expense, key, value)
 
         self.session.commit()
+        self.session.refresh(expense)
         return expense
 
-    def delete_by_id(self, expense_id):
-        expense = self.get_by_id(expense_id)
+    # ---------------- DELETE ----------------
+    def delete_by_id(self, transaction_id: int):
+        expense = self.get_by_id(transaction_id)
 
-        if expense:
-            self.delete(expense)
+        if not expense:
+            return None
 
+        self.session.delete(expense)
+        self.session.commit()
         return expense

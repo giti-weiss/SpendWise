@@ -1,5 +1,3 @@
-# repositories/enums/expense_types_repository.py
-
 from models.Finance.ExpenseType import ExpenseType
 from repositories.base_repository import BaseRepository
 
@@ -9,7 +7,7 @@ class ExpenseTypesRepository(BaseRepository):
     def get_by_id(self, expense_type_id):
         return (
             self.session.query(ExpenseType)
-            .filter_by(ExpenseTypeId=expense_type_id)
+            .filter_by(expenseTypeId=expense_type_id)
             .first()
         )
 
@@ -19,7 +17,7 @@ class ExpenseTypesRepository(BaseRepository):
     def exists_by_name(self, name):
         return (
             self.session.query(ExpenseType)
-            .filter_by(ExpenseTypeName=name)
+            .filter_by(expenseTypeName=name)
             .first() is not None
         )
 

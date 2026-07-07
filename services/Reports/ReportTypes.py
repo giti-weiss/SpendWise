@@ -1,31 +1,37 @@
-from typing import List, Optional
+# services/Reports/ReportTypes.py
 
-from dto.reporting.ReportTypesDto import ReportTypeDTO
+from dto.reporting.ReportTypesDto import ReportTypeCreateDTO, ReportTypeResponseDTO
 from repositories.reporting.ReportTypes import ReportTypesRepository
+from models.reporting.ReportTypes import ReportType
 
 
 class ReportTypesService:
+    def __init__(self, repo: ReportTypesRepository):
+        self.repo = repo
 
-    def __init__(self, repository: ReportTypesRepository):
-        self.repository = repository
 
-    def get_by_id(self, report_type_id: int) -> Optional[ReportTypeDTO]:
-        obj = self.repository.get_by_id(report_type_id)
-        return ReportTypeDTO.model_validate(obj) if obj else None
+    def get_all(self) -> list[ReportType]:
+        return self.repo.get_all()
 
-    def get_all(self) -> List[ReportTypeDTO]:
-        return [
-            ReportTypeDTO.model_validate(x)
-            for x in self.repository.get_all()
-        ]
+    def get_by_id(self, report_type_id: int) -> ReportType | None:
+        return self.repo.get_by_id(report_type_id)
 
-    def create(self, report_type_name: str) -> ReportTypeDTO:
-        obj = self.repository.create(report_type_name)
-        return ReportTypeDTO.model_validate(obj)
 
-    def update(self, report_type_id: int, report_type_name: str) -> Optional[ReportTypeDTO]:
-        obj = self.repository.update(report_type_id, report_type_name=report_type_name)
-        return ReportTypeDTO.model_validate(obj) if obj else None
+    """
+        def update(self, report_type_id: int, dto: ReportTypeCreateDTO) -> ReportType | None:
+        report_type = self.repo.get_by_id(report_type_id)
+        if not report_type:
+            return None
+
+        report_type.report_type_name = dto.report_type_name
+        return self.repo.update(report_type)
 
     def delete(self, report_type_id: int) -> bool:
-        return self.repository.delete_by_id(report_type_id)
+        return self.repo.delete_by_id(report_type_id)
+        
+        def create(self, dto: ReportTypeCreateDTO) -> ReportType:
+        # יוצרים מופע חדש של ReportType
+        report_type = ReportType(report_type_name=dto.report_type_name)
+        return self.repo.create(report_type)
+   
+    """
