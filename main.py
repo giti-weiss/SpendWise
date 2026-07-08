@@ -53,7 +53,6 @@ from controller.system.SpecialDates import special_dates_blueprint
 from controller.system.MonthlyExpensesSummary import monthly_expenses_summary_blueprint
 from controller.Finance.EarlyWarning import early_warning_bp
 
-
 app = Flask(__name__)
 
 app.register_blueprint(categories_blueprint)
@@ -97,11 +96,6 @@ app.register_blueprint(financial_controller)
 app.register_blueprint(early_warning_bp)
 
 print(app.url_map)
-
-
-@app.before_request
-def debug_request():
-    print("REQUEST:", request.method, request.path)
 
 @app.route('/')
 def home():

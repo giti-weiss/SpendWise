@@ -80,3 +80,8 @@ class Category(Base):
         "EarlyWarningAlert",
         back_populates="category"
     )
+
+    budget_plans = relationship(
+        "BudgetPlan",
+        back_populates="category"
+    )

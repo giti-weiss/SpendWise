@@ -38,6 +38,7 @@ from models.system.SpecialDate import SpecialDate
 from models.system.SpecialDateType import SpecialDateType
 from models.Finance.IncomeCategory import IncomeCategory
 from models.system.EarlyWarningAlert import EarlyWarningAlert
+from models.Finance.BudgetPlan import BudgetPlan
 
 
 

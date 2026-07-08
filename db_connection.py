@@ -1,8 +1,5 @@
 from models.base import Base
-"""
-from models import import_all 
- import models.import_all# רק כדי לטעון מודלים
-"""
+import models.import_all as _models  # must load models before session  # noqa: F401
 
 print("IMPORT ALL LOADED")
 from sqlalchemy import create_engine

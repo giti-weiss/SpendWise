@@ -52,4 +52,12 @@ class User(Base):
         back_populates="user",
         uselist=False
     )
+    early_warning_alerts = relationship(
+        "EarlyWarningAlert",
+        back_populates="user"
+    )
 
+    budget_plans = relationship(
+        "BudgetPlan",
+        back_populates="user"
+    )
