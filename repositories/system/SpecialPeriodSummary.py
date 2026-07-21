@@ -71,3 +71,26 @@ class SpecialPeriodSummaryRepository:
             category_id=category_id,
             special_period_id=period_id
         ).first()
+
+    def get_ratios_by_period(self, period_id):
+        """
+        Returns dict: {category_id: change_ratio} for all categories
+        in Holiday_Category_Summary for the given period.
+        Ratios are normalized to 0–1 (divided by 100 if >1).
+        """
+        rows = self.session.query(HolidayCategorySummary).filter_by(
+            special_period_id=period_id
+        ).all()
+
+        result = {}
+        for r in rows:
+            try:
+                val = float(r.change_ratio) if r.change_ratio else 0.0
+            except (ValueError, TypeError):
+                val = 0.0
+            if val > 1:
+                val = val / 100.0
+            val = max(0.0, min(val, 1.0))
+            if val > 0:
+                result[r.category_id] = val
+        return result

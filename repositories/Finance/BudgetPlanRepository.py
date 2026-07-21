@@ -27,6 +27,8 @@ class BudgetPlanRepository(BaseRepository):
                 year=year,
                 month=month,
                 planned_amount=item.get("planned_amount", 0),
+                holiday_adjustment=item.get("holiday_adjustment", 0),
+                holiday_name=item.get("holiday_name"),
             )
             self.session.add(row)
 

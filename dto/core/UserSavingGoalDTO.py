@@ -1,13 +1,21 @@
-class UserSavingGoalDTO:
+class AllocationDTO:
+    """פריט הקצאה בודד."""
+    def __init__(self, goal_id, amount):
+        self.goal_id = goal_id
+        self.amount = amount
 
-    def __init__(
-        self,
-        user_id,
-        saving_mode=None,
-        target_percent=None,
-        target_amount=None
-    ):
+
+class UpdateAllocationsRequest:
+    """בקשה לעדכון הקצאות."""
+    def __init__(self, allocations):
+        self.allocations = allocations  # [{"goal_id": 1, "amount": 1000}, ...]
+
+
+class MonthlySavingsResponse:
+    """תשובה — מצב חיסכון חודשי."""
+    def __init__(self, user_id, year, month, saved_this_month, allocations):
         self.user_id = user_id
-        self.saving_mode = saving_mode
-        self.target_percent = target_percent
-        self.target_amount = target_amount
+        self.year = year
+        self.month = month
+        self.saved_this_month = saved_this_month
+        self.allocations = allocations  # list of UserSavingGoal

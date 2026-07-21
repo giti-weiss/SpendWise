@@ -22,7 +22,8 @@ from controller.core.users_controller import users_blueprint
 from controller.core.CategoryStandard import category_standard_bp
 from controller.core.UserCategoryGoal import user_goal_blueprint
 from controller.core.UserCategoryPreference import user_preferences_blueprint
-from controller.core.UserSavingGoal import saving_blueprint
+from controller.core.SavingsGoal import savings_blueprint
+from controller.core.UserSavingGoal import savings_distribution_blueprint
 
 from controller.Finance.Expenses import expenses_blueprint
 from controller.Finance.ExpenseTypes import expense_types_blueprint
@@ -31,21 +32,8 @@ from controller.Finance.ForecastRanges import forecast_ranges_blueprint
 from controller.Finance.IncomeFrequency import income_frequency_blueprint
 from controller.Finance.Incomes import income_blueprint
 from controller.Finance.IncomeCategories import income_categories_blueprint
-from controller.Finance.budget_controller import budget_controller
 from controller.Finance.budget_plan_controller import budget_plan_controller
-from controller.Finance.financial_controller import financial_controller
 
-
-from controller.Goals.GoalDetails import goal_details_blueprint
-from controller.Goals.Goals import goals_bp
-
-from controller.lookups.CategoryTypes import category_types_bp
-
-from controller.reporting.Reports import reports_bp
-from controller.reporting.ReportTypes import report_types_bp
-
-from controller.survey.SatisfactionSurvey import satisfaction_survey_blueprint
-from controller.survey.SurveyAnswers import survey_answers_blueprint
 
 from controller.system.HolidayCategorySummary import holiday_summary_blueprint
 from controller.system.SpecialPeriodSummary import special_period_summary_blueprint
@@ -68,17 +56,6 @@ app.register_blueprint(income_frequency_blueprint)
 app.register_blueprint(income_blueprint)
 app.register_blueprint(income_categories_blueprint)
 
-app.register_blueprint(goal_details_blueprint)
-app.register_blueprint(goals_bp)
-
-app.register_blueprint(category_types_bp)
-
-app.register_blueprint(reports_bp)
-app.register_blueprint(report_types_bp)
-
-app.register_blueprint(satisfaction_survey_blueprint)
-app.register_blueprint(survey_answers_blueprint)
-
 app.register_blueprint(holiday_summary_blueprint)
 app.register_blueprint(special_period_summary_blueprint)
 app.register_blueprint(special_dates_blueprint)
@@ -87,12 +64,11 @@ app.register_blueprint(monthly_expenses_summary_blueprint)
 app.register_blueprint(category_standard_bp)
 app.register_blueprint(user_goal_blueprint)
 
-app.register_blueprint(budget_controller)
 app.register_blueprint(user_preferences_blueprint)
-app.register_blueprint(saving_blueprint)
+app.register_blueprint(savings_blueprint)
+app.register_blueprint(savings_distribution_blueprint)
 
 app.register_blueprint(budget_plan_controller)
-app.register_blueprint(financial_controller)
 app.register_blueprint(early_warning_bp)
 
 print(app.url_map)

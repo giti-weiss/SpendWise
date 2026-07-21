@@ -14,21 +14,8 @@ class User(Base):
 
     incomes = relationship("Income", back_populates="user")
     expenses = relationship("Expense", back_populates="user")
-    goals = relationship("Goal", back_populates="user")
-    satisfaction_surveys = relationship(
-        "SatisfactionSurvey",
-        back_populates="user"
-    )
-    reports = relationship("Report", back_populates="user")
-    recommendations = relationship("Recommendation", back_populates="user")
-
-    special_expenses = relationship("SpecialExpense", back_populates="user")
     forecasts = relationship("FinancialForecast", back_populates="user")
     holiday_summaries = relationship("HolidayCategorySummary", back_populates="user")
-    goal_expectations = relationship(
-        "GoalExpectation",
-        back_populates="user"
-    )
     monthly_expense_summaries = relationship(
         "MonthlyExpensesSummary",
         back_populates="user"
@@ -47,10 +34,9 @@ class User(Base):
         "UserCategoryPreference",
         back_populates="user"
     )
-    saving_goal = relationship(
-        "UserSavingGoal",
-        back_populates="user",
-        uselist=False
+    savings_goals = relationship(
+        "SavingsGoal",
+        back_populates="user"
     )
     early_warning_alerts = relationship(
         "EarlyWarningAlert",
@@ -59,5 +45,11 @@ class User(Base):
 
     budget_plans = relationship(
         "BudgetPlan",
+        back_populates="user"
+    )
+
+    # הקצאות חיסכון חודשיות (User_Saving_Goal)
+    monthly_savings = relationship(
+        "UserSavingGoal",
         back_populates="user"
     )

@@ -1,9 +1,5 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify
 from db_connection import SessionLocal
-
-from dto.core.UserCategoryGoalDto import (
-    UserCategoryGoalCreateDTO
-)
 
 from services.core.UserCategoryGoalService import UserCategoryGoalService
 from repositories.core.UserCategoryGoalRepository import UserCategoryGoalRepository
@@ -38,10 +34,8 @@ def get_by_id(id):
     session, service = get_service()
     try:
         result = service.get_by_id(id)
-
         if not result:
             return jsonify({"message": "Not found"}), 404
-
         return jsonify(result.model_dump())
     finally:
         session.close()
@@ -57,49 +51,29 @@ def get_by_user(user_id):
         session.close()
 
 
-@user_goal_blueprint.route("", methods=["POST"])
-def create():
+@user_goal_blueprint.route("/user/<int:user_id>/recalculate", methods=["POST"])
+def recalculate(user_id):
+    """
+    מחשב מחדש את כל היעדים החודשיים לפי:
+    target_amount = amount_per_person × family_size
+    """
     session, service = get_service()
     try:
-        data = request.get_json()
-        dto = UserCategoryGoalCreateDTO.model_validate(data)
-
-        result = service.create(dto)
-
-        return jsonify(result.model_dump()), 201
+        results = service.recalculate_for_user(user_id)
+        return jsonify({
+            "message": f"Recalculated {len(results)} goals",
+            "goals": [r.model_dump() for r in results]
+        }), 201
     finally:
         session.close()
 
 
-@user_goal_blueprint.route("/<int:id>", methods=["PUT"])
-def update(id):
+@user_goal_blueprint.route("/user/<int:user_id>/targets", methods=["GET"])
+def get_targets_map(user_id):
+    """מחזיר dict: {category_id: target_amount}"""
     session, service = get_service()
     try:
-        data = request.get_json()
-
-        result = service.update(
-            id,
-            data.get("current_price"),
-            data.get("target_price")
-        )
-
-        if not result:
-            return jsonify({"message": "Not found"}), 404
-
-        return jsonify(result.model_dump())
-    finally:
-        session.close()
-
-
-@user_goal_blueprint.route("/<int:id>", methods=["DELETE"])
-def delete(id):
-    session, service = get_service()
-    try:
-        success = service.delete(id)
-
-        if not success:
-            return jsonify({"message": "Not found"}), 404
-
-        return jsonify({"success": True})
+        targets = service.get_targets_map(user_id)
+        return jsonify({"targets": targets})
     finally:
         session.close()

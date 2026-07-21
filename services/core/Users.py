@@ -13,9 +13,16 @@ class UsersService:
             last_name=dto.last_name,
             email=dto.email,
             password_hash=dto.password_hash,
+            family_size=dto.family_size if hasattr(dto, 'family_size') else 1,
             join_date=dto.join_date if hasattr(dto, 'join_date') else datetime.utcnow()
         )
         self.repo.add(user)
+
+        #  מחשב יעדים חודשיים לכל הקטגוריות
+        from repositories.core.UserCategoryGoalRepository import UserCategoryGoalRepository
+        goal_repo = UserCategoryGoalRepository(self.repo.session)
+        goal_repo.recalculate_for_user(user.user_id)
+
         return user
 
     def get_all_users(self):

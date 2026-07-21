@@ -1,35 +1,51 @@
 class UserSavingGoalService:
+    """
+    ניהול הקצאת חיסכון חודשית.
+
+    זרימה:
+    1. תחילת חודש — job יוצר רשומות ריקות לכל יעדי החיסכון
+    2. המשתמש נכנס, רואה את הסכום הפנוי, ממלא כמה רוצה לכל יעד
+    3. המשתמש מאשר — הסכומים מועברים ל-Savings_Goals (current_balance) + Transactions
+    """
 
     def __init__(self, repo):
         self.repo = repo
 
-    def save_goal(self, dto):
-        return self.repo.upsert(dto)
+    def get_monthly_allocations(self, user_id, year, month):
+        """מחזיר את ההקצאות של החודש."""
+        return self.repo.get_for_month(user_id, year, month)
 
-    def get_goal(self, user_id):
-        return self.repo.get_by_user(user_id)
+    def create_initial_for_month(self, user_id, year, month, goals):
+        """יוצר רשומות התחלתיות (0₪) בתחילת חודש."""
+        return self.repo.create_initial_for_month(user_id, year, month, goals)
 
-    # =========================
-    # לוגיקה לשימוש ב־#10
-    # =========================
-    def calculate_saving_target(self, goal, net_budget):
+    def update_allocations(self, user_id, year, month, allocations):
+        """המשתמש מעדכן סכומים."""
+        return self.repo.update_allocation(user_id, year, month, allocations)
 
-        if not goal:
-            return 0
+    def apply_savings(self, user_id, year, month, savings_goal_service):
+        """
+        מחיל את ההקצאות — מעביר כסף ל-Savings_Goals.
+        נקרא כשהמשתמש מאשר את ההקצאה.
 
-        if goal.target_amount:
-            return goal.target_amount
+        מחזיר: list of {"goal_id": X, "goal_name": Y, "added": Z, "new_balance": W}
+        """
+        pending = self.repo.get_pending_allocations(user_id, year, month)
+        results = []
 
-        if goal.target_percent:
-            return net_budget * (goal.target_percent / 100)
+        for record in pending:
+            if record.allocated_amount > 0:
+                txn = savings_goal_service.deposit(
+                    goal_id=record.goal_id,
+                    amount=record.allocated_amount,
+                    description=f"הקצאה חודשית — {year}-{month:02d}"
+                )
+                self.repo.mark_applied(record)
+                results.append({
+                    "goal_id": record.goal_id,
+                    "goal_name": record.goal.name if record.goal else "",
+                    "added": record.allocated_amount,
+                    "new_balance": record.goal.current_balance if record.goal else 0,
+                })
 
-        if goal.saving_mode == "HIGH":
-            return net_budget * 0.15
-
-        if goal.saving_mode == "MEDIUM":
-            return net_budget * 0.08
-
-        if goal.saving_mode == "LOW":
-            return net_budget * 0.03
-
-        return 0
+        return results

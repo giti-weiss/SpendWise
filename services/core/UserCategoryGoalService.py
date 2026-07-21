@@ -1,8 +1,6 @@
-from typing import List, Optional
-from datetime import datetime
+from typing import List, Optional, Dict
 
 from dto.core.UserCategoryGoalDto import (
-    UserCategoryGoalCreateDTO,
     UserCategoryGoalResponseDTO
 )
 
@@ -13,6 +11,8 @@ class UserCategoryGoalService:
 
     def __init__(self, repository: UserCategoryGoalRepository):
         self.repository = repository
+
+    # ================= BASIC =================
 
     def get_all(self) -> List[UserCategoryGoalResponseDTO]:
         return [
@@ -30,33 +30,22 @@ class UserCategoryGoalService:
             for x in self.repository.get_by_user(user_id)
         ]
 
-    def get_by_user_and_category(self, user_id: int, category_id: int) -> Optional[UserCategoryGoalResponseDTO]:
-        obj = self.repository.get_by_user_and_category(user_id, category_id)
-        return UserCategoryGoalResponseDTO.model_validate(obj) if obj else None
+    def get_targets_map(self, user_id: int) -> Dict[int, float]:
+        """
+        מחזיר dict: {category_id: target_amount}
+        שימושי ל-CutRankingService / BudgetPlanService.
+        """
+        return self.repository.get_targets_map(user_id)
 
-    def create(self, dto: UserCategoryGoalCreateDTO) -> UserCategoryGoalResponseDTO:
-        obj = self.repository.create(
-            obj_data={
-                "user_id": dto.user_id,
-                "category_id": dto.category_id,
-                "current_price": dto.current_price,
-                "target_price": dto.target_price,
-                "created_at": datetime.utcnow(),
-                "updated_at": datetime.utcnow()
-            }
-        )
+    # ================= CORE =================
 
-        return UserCategoryGoalResponseDTO.model_validate(obj)
-
-    def update(self, id: int, current_price, target_price) -> Optional[UserCategoryGoalResponseDTO]:
-        obj = self.repository.update(
-            id,
-            current_price=current_price,
-            target_price=target_price,
-            updated_at=datetime.utcnow()
-        )
-
-        return UserCategoryGoalResponseDTO.model_validate(obj) if obj else None
-
-    def delete(self, id: int) -> bool:
-        return self.repository.delete_by_id(id) is not None
+    def recalculate_for_user(self, user_id: int) -> List[UserCategoryGoalResponseDTO]:
+        """
+        מחשב מחדש את כל היעדים החודשיים למשתמש לפי:
+        target_amount = amount_per_person × family_size
+        """
+        results = self.repository.recalculate_for_user(user_id)
+        return [
+            UserCategoryGoalResponseDTO.model_validate(x)
+            for x in results
+        ]
