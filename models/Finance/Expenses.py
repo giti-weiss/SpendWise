@@ -29,14 +29,6 @@ class Expense(Base):
         nullable=False
     )
 
-    is_one_time = Column(Boolean, default=False)
-    covered_by_savings = Column(Boolean, default=False)
-    savings_goal_id = Column(
-        Integer,
-        ForeignKey("Savings_Goals.id"),
-        nullable=True
-    )
-
     expense_type = relationship(
         "ExpenseType",
         back_populates="expenses"

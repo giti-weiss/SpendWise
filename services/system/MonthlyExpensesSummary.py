@@ -1,8 +1,7 @@
 class MonthlyExpensesSummaryService:
 
-    def __init__(self, repository, special_period_service=None):
+    def __init__(self, repository):
         self.repository = repository
-        self.special_period_service = special_period_service
 
     def calculate_category_analysis(self, user_id, year, month):
 
@@ -11,29 +10,14 @@ class MonthlyExpensesSummaryService:
         if not rows:
             return {"categories": []}
 
-        # =========================
-        # נירמול חגים — מנרמל את סכום החודש הנוכחי עבור קטגוריות
-        # שמושפעות מתקופת חג, כך שההשוואה לחודשים קודמים תהיה הוגנת.
-        # אם Food בחודש פסח הוא 1469₪ עם +13% חג,
-        # מנרמלים חזרה ל-~1300₪ (מחלקים ב-1+ratio).
-        # =========================
-        holiday_ratios = {}
-        if self.special_period_service:
-            _, holiday_ratios = self.special_period_service.resolve_period_ratios(year, month)
-
         categories = []
 
         for r in rows:
 
             current = r.get("current_month_amount", 0)
             previous = r.get("previous_month_amount", 0)
-            expense_type = r.get("expense_type_id", 2)
 
-            # נרמול חג: מחלקים את הסכום הנוכחי ב-(1+ratio)
-            category_id = r.get("category_id")
-            ratio = holiday_ratios.get(category_id, 0)
-            if ratio > 0:
-                current = current / (1 + ratio)
+            expense_type = r.get("expense_type_id", 2)
 
             # =========================
             # שינוי חודשי (תיקון חשוב)

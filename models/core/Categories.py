@@ -27,6 +27,11 @@ class Category(Base):
 
     # ===== relationships =====
 
+    category_type = relationship(
+        "CategoryType",
+        back_populates="categories"
+    )
+
     category_standard = relationship(
         "CategoryStandard",
         back_populates="category",
@@ -35,6 +40,11 @@ class Category(Base):
 
     expenses = relationship(
         "Expense",
+        back_populates="category"
+    )
+
+    special_expenses = relationship(
+        "SpecialExpense",
         back_populates="category"
     )
 
@@ -75,4 +85,3 @@ class Category(Base):
         "BudgetPlan",
         back_populates="category"
     )
-
