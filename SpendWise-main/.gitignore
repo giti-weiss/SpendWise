@@ -40,3 +40,8 @@ htmlcov/
 node_modules/
 client/node_modules/
 client/fronted/
+
+# Logs and local DB backups
+*.log
+*.db.backup*
+spendwise-dev.backup*.db
